@@ -4,9 +4,10 @@ import { FaGithub, FaLinkedin, FaTwitter, FaInstagram, FaUser } from "react-icon
 import { useParams } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import CommentSection from "../components/CommentSection";
+import Footer from "../components/Footer";
 
 const ProjectDetail = () => {
-  const { slug } = useParams(); // ✅ get slug from URL
+  const { slug } = useParams(); 
   const { projectsData } = useContext(AppContext);
 
   // find the project by slug
@@ -43,44 +44,40 @@ const ProjectDetail = () => {
 
   return (
     <div className="w-full bg-[rgb(32,32,35)] text-gray-200">
-      {/* Hero Section */}
- <div className="bg-[rgb(40,40,45)] py-16 px-6 text-center">
-  {/* Title */}
-  <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-    {project.hero?.title}
-  </h1>
+<div
+  className="relative bg-center bg-no-repeat min-h-[60vh] px-6 text-center flex items-center justify-center"
+  style={{
+    backgroundImage: `url(${project.image})`,
+    backgroundSize: "contain",   // 👈 shows full image
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "center",
+  }}
+>
+  <div className="absolute inset-0 bg-black/60"></div>
 
-  {/* Description */}
-  <p className="text-gray-400 max-w-2xl mx-auto mb-6 text-sm sm:text-base">
-    {project.hero?.description}
-  </p>
-
-  {/* Image (optional, center-aligned) */}
-  {project.hero?.image && (
-    <div className="flex justify-center mb-6">
-      <img
-        src={project.hero.image}
-        alt={project.hero.title}
-        className="rounded-xl shadow-lg max-h-72 object-contain"
-      />
+  <div className="relative z-10 max-w-3xl mx-auto py-10">
+    <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+      {project.hero?.title}
+    </h1>
+    <p className="text-gray-300 max-w-2xl mx-auto mb-6 text-sm sm:text-base">
+      {project.hero?.description}
+    </p>
+    <div className="flex flex-wrap justify-center gap-4">
+      {project.hero?.buttons?.map((button) => (
+        <a
+          key={button._id}
+          href={button.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-pink-600 px-5 py-2 rounded-lg font-medium hover:bg-pink-700 transition text-sm sm:text-base"
+        >
+          {button.text}
+        </a>
+      ))}
     </div>
-  )}
-
-  {/* Buttons */}
-  <div className="flex flex-wrap justify-center gap-4">
-    {project.hero?.buttons?.map((button) => (
-      <a
-        key={button._id}
-        href={button.link}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="bg-pink-600 px-5 py-2 rounded-lg font-medium hover:bg-pink-700 transition text-sm sm:text-base"
-      >
-        {button.text}
-      </a>
-    ))}
   </div>
 </div>
+
 
 
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-10 px-4 sm:px-6 py-12 sm:py-16">
@@ -99,7 +96,7 @@ const ProjectDetail = () => {
                  </div>
           {/* Navigation */}
           <nav className="bg-[rgb(40,40,45)] rounded-2xl p-6 shadow-lg">
-            <h4 className="text-sm uppercase text-gray-400 mb-3">
+            <h4 className="text-lg uppercase text-white font-bold mb-3">
               On this page
             </h4>
             <ul className="space-y-3 text-sm">
@@ -120,7 +117,7 @@ const ProjectDetail = () => {
           </nav>
           {project.relatedArticles && project.relatedArticles.length > 0 && (
             <div className="bg-[rgb(40,40,45)] rounded-2xl p-6 shadow-lg">
-              <h4 className="text-lg font-bold text-white mb-4"> Related Articles </h4>
+              <h4 className="text-lg font-bold text-white mb-4">Related work</h4>
               <div className="space-y-3">
                 {project.relatedArticles.map((related) =>
                 (<a key={related._id} href={related.link} className="block text-gray-400 
@@ -184,6 +181,7 @@ const ProjectDetail = () => {
           </section>
         </main>
       </div>
+      <Footer/>
     </div>
   );
 };

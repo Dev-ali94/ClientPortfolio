@@ -1,9 +1,19 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { FaComments, FaProjectDiagram, FaAddressBook } from "react-icons/fa";
 import { AppContext } from "../context/AppContext";
 
 const Home = () => {
   const { commentsData, projectsData, contactsData } = useContext(AppContext);
+
+  // ✅ Load hidden comment IDs from localStorage
+  const [hiddenComments, setHiddenComments] = useState(
+    JSON.parse(localStorage.getItem("hiddenComments")) || []
+  );
+
+  // ✅ Filter out hidden comments from the total
+  const visibleComments = commentsData.filter(
+    (comment) => !hiddenComments.includes(comment._id)
+  );
 
   const stats = [
     {
@@ -15,7 +25,7 @@ const Home = () => {
     {
       id: 2,
       title: "Total Comments",
-      value: commentsData.length,
+      value: visibleComments.length, // ✅ count only visible comments
       icon: <FaComments className="text-pink-500 text-4xl" />,
     },
     {
@@ -28,7 +38,7 @@ const Home = () => {
 
   return (
     <div className="flex flex-col gap-y-17 h-full w-full bg-[#1a1a1d] text-white">
-      {/*Header */}
+      {/* Header */}
       <div className="p-8 border-b border-[#2e2e33] text-center">
         <h1 className="text-3xl font-extrabold tracking-wide">
           Dashboard <span className="text-pink-500">Overview</span>
@@ -37,20 +47,18 @@ const Home = () => {
           Quick stats about your projects, comments, and contacts
         </p>
       </div>
-<div>
 
-</div>
       {/* Stats Cards */}
-      <div className="flex flex-wrap justify-center gap-6 p-8 ">
-        {stats.map((stats) => (
+      <div className="flex flex-wrap justify-center gap-6 p-8">
+        {stats.map((stat) => (
           <div
-            key={stats.id}
+            key={stat.id}
             className="flex flex-col items-center justify-center p-6 rounded-2xl 
                        bg-[#232326] w-60 h-40 text-center"
           >
-            <div className="mb-4">{stats.icon}</div>
-            <h2 className="text-lg font-semibold">{stats.title}</h2>
-            <p className="text-3xl font-bold text-pink-500 mt-2">{stats.value}</p>
+            <div className="mb-4">{stat.icon}</div>
+            <h2 className="text-lg font-semibold">{stat.title}</h2>
+            <p className="text-3xl font-bold text-pink-500 mt-2">{stat.value}</p>
           </div>
         ))}
       </div>

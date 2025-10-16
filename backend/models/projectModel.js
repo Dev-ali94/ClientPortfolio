@@ -4,61 +4,60 @@ const projectSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: true,
+      required: false, // ❌ was true
     },
     slug: {
       type: String,
-      required: true,
       unique: true,
       lowercase: true,
       trim: true,
     },
     image: {
       type: String,
-      required: true,
+      required: false,
     },
     description: {
-      type: String, 
-      required: true,
+      type: String,
+      required: false,
     },
 
-    //  Hero section
+    // Hero section
     hero: {
-      title: { type: String, required: true },
-      description: { type: String, required: true },
-      buttons: [ 
+      title: { type: String, required: false },
+      description: { type: String, required: false },
+      buttons: [
         {
-          text: { type: String, required: true },
-          link: { type: String, required: true },
-        }
-      ]
+          text: { type: String, required: false },
+          link: { type: String, required: false },
+        },
+      ],
     },
 
-    //  Project overview 
+    // Project overview
     overview: {
-      content: { type: String, required: true },
+      content: { type: String, required: false },
     },
 
-    //  Project results 
+    // Project results
     results: [
       {
-        title: { type: String, required: true },
-        desc: { type: String, required: true },
+        title: { type: String, required: false },
+        desc: { type: String, required: false },
       },
     ],
 
-    //  Process section
+    // Process section
     process: [
       {
-        title: { type: String, required: true },
+        title: { type: String, required: false },
       },
     ],
 
-    // Related articles 
+    // Related articles
     relatedArticles: [
       {
-        title: { type: String, required: true },
-        link: { type: String, required: true },
+        title: { type: String, required: false },
+        link: { type: String, required: false },
       },
     ],
   },

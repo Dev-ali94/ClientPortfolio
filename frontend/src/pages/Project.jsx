@@ -45,7 +45,7 @@ const Project = () => {
       {/* Heading */}
       <div className="flex flex-col items-center text-center space-y-3 max-w-2xl">
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
-          My Latest Projects
+          My Latest Work
         </h2>
         <p className="text-gray-300 text-sm sm:text-base md:text-lg leading-relaxed">
           A collection of projects where I share insights, tutorials, and ideas
@@ -69,7 +69,8 @@ const Project = () => {
                 key={project._id || index}
                 className="min-w-[180px] sm:min-w-[200px] md:min-w-[220px] lg:min-w-[240px]
                 bg-[#28282B] rounded-xl p-3 sm:p-4 flex flex-col 
-                shadow-md hover:shadow-xl transition-all duration-300 relative group hover:-translate-y-1"
+                shadow-lg shadow-black/60transition-all duration-300 
+                relative group hover:-translate-y-1"
                 onClick={() => isTouch && handleTap(index)}
               >
                 {/* Project Image */}
@@ -77,7 +78,8 @@ const Project = () => {
                   <img
                     src={project.image}
                     alt={project.title}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    className="w-full h-full object-cover transition-transform 
+                    duration-300 group-hover:scale-110"
                   />
                 </div>
 
@@ -104,7 +106,7 @@ const Project = () => {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/project/${project.slug}`); // ✅ navigate by slug
+                      navigate(`/project/${project.slug}`); 
                     }}
                     className="bg-gradient-to-tr from-purple-700 via-pink-700 to-red-500 text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform duration-300"
                   >

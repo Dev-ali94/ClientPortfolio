@@ -3,7 +3,7 @@ import {  FaLinkedin, FaInstagram, FaFacebook, FaFacebookMessenger } from "react
 
 const Footer = () => {
   return (
-    <footer className="w-full bg-[rgb(32,32,35)] text-gray-300 ">
+    <footer className="w-full bg-[rgb(28,28,31)] text-gray-300 ">
       <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-3 gap-8">
 
         {/*About */}
