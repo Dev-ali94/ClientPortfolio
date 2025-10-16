@@ -7,6 +7,7 @@ import Footer from './Footer'
 import Contact from '../pages/Contact'
 import Project from '../pages/Project'
 
+
 const Home = () => {
   return (
 
