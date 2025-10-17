@@ -13,8 +13,10 @@ connectDB()
 
 const allowedOrigins = [
   process.env.FRONTEND_URL,
-  process.env.ADMIN_URL
+  process.env.ADMIN_URL,
+  "http://localhost:5173"
 ];
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
