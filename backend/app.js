@@ -13,30 +13,29 @@ connectDB();
 
 const app = express();
 
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
 const allowedOrigins = [
   process.env.ADMIN_URL,   // admin frontend
   process.env.PUBLIC_URL,  // public frontend
   "http://localhost:5173"  // local dev URL
 ];
-
-app.use(cookieParser());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Dynamic CORS
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like curl, mobile, server-to-server)
+    // allow requests with no origin (like Postman)
     if (!origin) return callback(null, true);
+
     if (allowedOrigins.includes(origin)) {
-      callback(null, true); // allow this origin
+      callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
     }
   },
-  credentials: true, // allow cookies for admin
+  credentials: true, // <--- This is mandatory for cookies
 }));
-
 // Routes
 app.use("/api/project", projectRoutes);
 app.use("/api/comments", commentsRoutes);
