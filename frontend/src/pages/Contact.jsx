@@ -32,7 +32,7 @@ const Contact = () => {
     setError("");
     try {
       setLoading(true);
-      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/contact/cretae-contact`, {
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/contact/create-contact`, {
         name,
         email,
         message,

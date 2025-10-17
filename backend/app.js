@@ -11,18 +11,31 @@ const app = express();
 dotenv.config();
 connectDB()
 
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.ADMIN_URL
+];
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+
 app.use(cors({
-  origin: `${process.env.FRONTEND_URL}`,  
-  credentials: true                 
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
 }));
 
 app.use("/api/project", projectRoutes);
 app.use("/api/comments", commentsRoutes);
 app.use("/api/contact", contactRotes);
 app.use("/api/admin", AdminLogin);
-app.use("/api/project", projectRoutes);
 
 export default app;
