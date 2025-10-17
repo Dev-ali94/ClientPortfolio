@@ -11,7 +11,7 @@ const Login = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
 
-  // Check if already logged in
+  // Check if admin is already logged in
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -19,8 +19,8 @@ const Login = () => {
           `${import.meta.env.VITE_BACKEND_URL}/api/admin/auth`,
           { withCredentials: true }
         );
-        setIsLoggedIn(data.success || false);
-      } catch {
+        setIsLoggedIn(data.success); // use backend success
+      } catch (err) {
         setIsLoggedIn(false);
       } finally {
         setLoading(false);
@@ -29,10 +29,10 @@ const Login = () => {
     checkAuth();
   }, []);
 
-  // Redirect to dashboard if already logged in
+  // Redirect immediately if logged in
   useEffect(() => {
     if (!loading && isLoggedIn) {
-      navigate("/");
+      navigate("/"); // redirect to main page
     }
   }, [loading, isLoggedIn, navigate]);
 
@@ -46,20 +46,21 @@ const Login = () => {
       );
 
       if (data.success) {
-        setName("");
-        setEmail("");
-        setPassword("");
-        navigate("/");
+        navigate("/"); // redirect on success
       } else {
-        alert(data.message);
+        alert(data.message); // show backend error message
       }
     } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || "Error logging in");
+      alert(err.response?.data?.message || "Login failed");
     }
   };
 
-  if (loading) return <p className="text-white text-center mt-10">Checking login...</p>;
+  if (loading) {
+    return <p className="text-white text-center mt-10">Checking login...</p>;
+  }
+
+  // Prevent rendering login page if already logged in
+  if (isLoggedIn) return null;
 
   return (
     <section className="w-full min-h-screen bg-[#1a1a1d] flex flex-col items-center justify-center text-white px-6 py-12">
@@ -70,6 +71,7 @@ const Login = () => {
           <span className="text-pink-500 font-medium">admin dashboard</span>.
         </p>
       </div>
+
       <div className="w-full max-w-md bg-[#1c1c1f] p-8 rounded-2xl shadow-xl">
         <form onSubmit={handleLoginSubmit} className="space-y-5">
           <div>
@@ -82,6 +84,7 @@ const Login = () => {
               className="w-full px-4 py-3 rounded-xl bg-[#18181b] text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-pink-600 transition"
             />
           </div>
+
           <div>
             <label className="block text-sm mb-2 text-gray-300">Email</label>
             <input
@@ -92,6 +95,7 @@ const Login = () => {
               className="w-full px-4 py-3 rounded-xl bg-[#18181b] text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-pink-600 transition"
             />
           </div>
+
           <div>
             <label className="block text-sm mb-2 text-gray-300">Password</label>
             <input
@@ -102,6 +106,7 @@ const Login = () => {
               className="w-full px-4 py-3 rounded-xl bg-[#18181b] text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-pink-600 transition"
             />
           </div>
+
           <button
             type="submit"
             className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-pink-600 hover:bg-pink-700 shadow-lg shadow-pink-800/40 font-semibold text-white transition duration-300"
