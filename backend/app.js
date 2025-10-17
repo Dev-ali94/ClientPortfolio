@@ -25,9 +25,6 @@ app.use(cors({
   origin: allowedOrigins,  // allow only these origins
   credentials: true        // allow cookies
 }));
-
-
-
 app.use("/api/project", projectRoutes);
 app.use("/api/comments", commentsRoutes);
 app.use("/api/contact", contactRotes);

@@ -5,7 +5,6 @@ import {
   FaTwitter,
   FaInstagram,
   FaUser,
-  FaBars,
   FaTimes,
 } from "react-icons/fa";
 import { useParams } from "react-router-dom";
@@ -25,24 +24,23 @@ const ProjectDetail = () => {
   const [activeSection, setActiveSection] = useState("overview");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const containerRef = useRef(null);
-
-  // Hero
+  // Refs for Hero
   const heroTitleRef = useRef(null);
   const heroDescRef = useRef(null);
   const heroButtonsRef = useRef([]);
+  heroButtonsRef.current = [];
 
-  // Sections
+  // Refs for Sections
   const overviewRef = useRef(null);
   const processRef = useRef(null);
   const resultRefs = useRef([]);
 
-  // Sidebar desktop
+  // Refs for Sidebar (desktop)
   const writerRef = useRef(null);
   const navRef = useRef(null);
   const relatedRef = useRef(null);
 
-  // Sidebar mobile
+  // Mobile Sidebar
   const mobileSidebarRef = useRef(null);
   const mobileBtnRef = useRef(null);
 
@@ -61,124 +59,69 @@ const ProjectDetail = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // GSAP Animations on scroll
+  // GSAP Animations
   useEffect(() => {
     if (!project) return;
 
-    // Hero animations
-    gsap.from(heroTitleRef.current, {
-      opacity: 0,
-      y: 50,
-      scale: 0.9,
-      duration: 1,
-      ease: "back.out(1.7)",
-      scrollTrigger: {
-        trigger: heroTitleRef.current,
-        start: "top 90%",
-      },
-    });
-
-    gsap.from(heroDescRef.current, {
-      opacity: 0,
-      y: 40,
-      duration: 1,
-      delay: 0.2,
-      ease: "back.out(1.7)",
-      scrollTrigger: {
-        trigger: heroDescRef.current,
-        start: "top 90%",
-      },
-    });
-
-    gsap.from(heroButtonsRef.current, {
-      opacity: 0,
-      y: 20,
-      scale: 0.8,
-      duration: 0.6,
-      stagger: 0.15,
-      ease: "back.out(1.7)",
-      scrollTrigger: {
-        trigger: heroButtonsRef.current[0],
-        start: "top 90%",
-      },
-    });
-
-    // Content sections
-    gsap.utils.toArray([overviewRef.current, processRef.current]).forEach((el) => {
-      if (el) {
-        gsap.from(el, {
-          opacity: 0,
-          y: 50,
+    const animateElement = (el, delay = 0) => {
+      if (!el) return;
+      gsap.fromTo(
+        el,
+        { opacity: 0, y: 50, scale: 0.85 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
           duration: 1,
-          ease: "power3.out",
+          delay,
+          ease: "back.out(1.7)",
           scrollTrigger: {
             trigger: el,
             start: "top 90%",
+            toggleActions: "play none none reverse",
           },
-        });
-      }
-    });
+        }
+      );
+    };
 
-    resultRefs.current.forEach((card, i) => {
-      gsap.from(card, {
-        opacity: 0,
-        y: 60,
-        scale: 0.85,
-        duration: 1,
-        delay: i * 0.15,
-        ease: "back.out(1.7)",
-        scrollTrigger: {
-          trigger: card,
-          start: "top 90%",
-        },
-      });
-    });
+    // Animate Hero
+    animateElement(heroTitleRef.current);
+    animateElement(heroDescRef.current, 0.2);
+    heroButtonsRef.current.forEach((btn, i) => animateElement(btn, 0.3 + i * 0.1));
 
-    // Desktop sidebar fade-in
-    [writerRef.current, navRef.current, relatedRef.current].forEach((el) => {
-      if (el) {
-        gsap.from(el, {
-          opacity: 0,
-          y: 30,
-          scale: 0.95,
-          duration: 0.8,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: el,
-            start: "top 90%",
-          },
-        });
-      }
-    });
+    // Animate Sections
+    animateElement(overviewRef.current);
+    animateElement(processRef.current);
+    resultRefs.current.forEach((card, i) => animateElement(card, 0.2 + i * 0.1));
+
+    // Animate Sidebar Desktop
+    [writerRef.current, navRef.current, relatedRef.current].forEach((el, i) =>
+      animateElement(el, 0.2 + i * 0.1)
+    );
 
     ScrollTrigger.refresh();
   }, [project]);
 
-  // Mobile sidebar animation
+  // Mobile Sidebar Animation
   useEffect(() => {
-    if (isSidebarOpen) {
-      gsap.to(mobileSidebarRef.current, {
-        x: 0,
-        duration: 0.6,
-        ease: "power3.out",
-      });
-    } else {
-      gsap.to(mobileSidebarRef.current, {
-        x: "-100%",
-        duration: 0.6,
-        ease: "power3.in",
-      });
-    }
+    if (!mobileSidebarRef.current) return;
+    gsap.to(mobileSidebarRef.current, {
+      x: isSidebarOpen ? 0 : "-100%",
+      duration: 0.6,
+      ease: isSidebarOpen ? "power3.out" : "power3.in",
+    });
   }, [isSidebarOpen]);
 
-  // Mobile button entrance animation
+  // Mobile button entrance
   useEffect(() => {
-    gsap.from(mobileBtnRef.current, {
-      y: 50,
-      opacity: 0,
-      duration: 0.6,
-      ease: "back.out(1.7)",
-    });
+    if (mobileBtnRef.current) {
+      gsap.from(mobileBtnRef.current, {
+        y: 50,
+        opacity: 0,
+        duration: 0.6,
+        ease: "back.out(1.7)",
+      });
+    }
   }, []);
 
   if (!project) {
@@ -191,25 +134,24 @@ const ProjectDetail = () => {
 
   return (
     <>
-      {/* 🍔 Floating Mobile Sidebar Toggle */}
+      {/* Mobile Toggle Button */}
       <button
         ref={mobileBtnRef}
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         className={`lg:hidden fixed bottom-6 -right-1 -translate-x-1/2 z-50 h-15 w-15 rounded-full 
           bg-pink-600 text-white shadow-2xl backdrop-blur-md flex flex-col justify-center items-center transition-all duration-500 hover:scale-110 ${
-          isSidebarOpen ? "rotate-90" : "rotate-0"
-        }`}
+            isSidebarOpen ? "rotate-90" : "rotate-0"
+          }`}
       >
         <div className="w-6 h-1 bg-white mb-1 rounded-full"></div>
         <div className="w-6 h-1 bg-white mb-1 rounded-full"></div>
         <div className="w-6 h-1 bg-white rounded-full"></div>
       </button>
 
-      {/* 🌈 Mobile Sidebar Panel */}
+      {/* Mobile Sidebar */}
       <div
         ref={mobileSidebarRef}
-        className="fixed top-0 left-0 h-full w-72 bg-[rgba(40,40,45,0.8)] 
-        backdrop-blur-xl text-gray-200 z-50 transform -translate-x-full flex flex-col shadow-2xl border-r border-white/10"
+        className="fixed top-0 left-0 h-full w-72 bg-[rgba(40,40,45,0.8)] backdrop-blur-xl text-gray-200 z-50 transform -translate-x-full flex flex-col shadow-2xl border-r border-white/10"
       >
         <div className="p-4 flex justify-between items-center border-b border-gray-700">
           <h2 className="text-lg font-bold text-white">Menu</h2>
@@ -220,7 +162,6 @@ const ProjectDetail = () => {
             <FaTimes size={20} />
           </button>
         </div>
-
         <div className="flex-1 overflow-y-auto p-4 space-y-8">
           {/* Writer */}
           <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-4 shadow-lg">
@@ -270,9 +211,7 @@ const ProjectDetail = () => {
           {/* Related Work */}
           {project.relatedArticles?.length > 0 && (
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-4 shadow-lg">
-              <h4 className="text-lg font-bold text-white mb-4">
-                Related work
-              </h4>
+              <h4 className="text-lg font-bold text-white mb-4">Related work</h4>
               <div className="space-y-3">
                 {project.relatedArticles.map((related) => (
                   <a
@@ -289,52 +228,52 @@ const ProjectDetail = () => {
         </div>
       </div>
 
-      {/* 🟣 Hero Section */}
-      <div
-        ref={containerRef}
-        className="w-full bg-[rgb(32,32,35)] text-gray-200"
-      >
-        <div
-          className="hero relative bg-center bg-no-repeat min-h-[60vh] px-6 text-center flex flex-col items-center justify-center"
-          style={{
-            backgroundImage: `url(${project.image})`,
-            backgroundSize: "contain",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center",
-          }}
-        >
-          <div className="absolute inset-0 bg-black/60"></div>
-          <div className="relative z-10 max-w-3xl mx-auto py-10">
-            <h1
-              ref={heroTitleRef}
-              className="text-3xl sm:text-4xl font-bold text-white mb-4"
-            >
-              {project.hero?.title}
-            </h1>
-            <p
-              ref={heroDescRef}
-              className="text-gray-300 max-w-2xl mx-auto mb-6 text-sm sm:text-base"
-            >
-              {project.hero?.description}
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              {project.hero?.buttons?.map((button, i) => (
-                <a
-                  key={button._id}
-                  ref={(el) => (heroButtonsRef.current[i] = el)}
-                  href={button.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-pink-600 px-5 py-2 rounded-lg font-medium hover:bg-pink-700 transition text-sm sm:text-base transform hover:scale-105"
-                >
-                  {button.text}
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
+      {/* Hero Section */}
+      <div className="w-full bg-[rgb(32,32,35)] text-gray-200">
+        <div className="hero relative min-h-[60vh] flex flex-col items-center justify-center px-6 text-center">
+  {/* Background Image */}
+  <img
+    src={project.image}
+    alt="Project Hero"
+    className="absolute inset-0 w-full h-full object-cover"
+  />
 
-        {/* 📄 Main Layout */}
+  {/* Dark overlay */}
+  <div className="absolute inset-0 bg-black/60"></div>
+
+  {/* Hero Content */}
+  <div className="relative z-10 max-w-3xl mx-auto py-10">
+    <h1
+      ref={heroTitleRef}
+      className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4"
+    >
+      {project.hero?.title}
+    </h1>
+    <p
+      ref={heroDescRef}
+      className="text-gray-300 max-w-2xl mx-auto mb-6 text-sm sm:text-base md:text-lg leading-relaxed"
+    >
+      {project.hero?.description}
+    </p>
+    <div className="flex flex-wrap justify-center gap-4">
+      {project.hero?.buttons?.map((button, i) => (
+        <a
+          key={button._id}
+          ref={(el) => (heroButtonsRef.current[i] = el)}
+          href={button.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-pink-600 px-5 py-2 rounded-lg font-medium hover:bg-pink-700 transition text-sm sm:text-base transform hover:scale-105"
+        >
+          {button.text}
+        </a>
+      ))}
+    </div>
+  </div>
+</div>
+
+
+        {/* Main Layout */}
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-10 px-4 sm:px-6 py-12 sm:py-16">
           {/* Sidebar Desktop */}
           <aside className="hidden lg:block lg:w-1/4 space-y-8 sticky top-24 self-start">
@@ -349,17 +288,15 @@ const ProjectDetail = () => {
                 Content Writer & SEO Specialist passionate about creating strategies that drive traffic and results.
               </p>
               <div className="flex gap-4 mt-4 text-xl">
-                {[FaGithub, FaLinkedin, FaTwitter, FaInstagram].map(
-                  (Icon, i) => (
-                    <a
-                      key={i}
-                      href="#"
-                      className="hover:text-pink-600 transform hover:scale-125 transition"
-                    >
-                      <Icon />
-                    </a>
-                  )
-                )}
+                {[FaGithub, FaLinkedin, FaTwitter, FaInstagram].map((Icon, i) => (
+                  <a
+                    key={i}
+                    href="#"
+                    className="hover:text-pink-600 transform hover:scale-125 transition"
+                  >
+                    <Icon />
+                  </a>
+                ))}
               </div>
             </div>
 
@@ -414,20 +351,20 @@ const ProjectDetail = () => {
           {/* Main Content */}
           <main className="w-full lg:w-3/4 space-y-16">
             <section id="overview" ref={overviewRef}>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
                 Project Overview
               </h2>
-              <p className="text-gray-400 leading-relaxed text-sm sm:text-base">
+              <p className="text-gray-400 leading-relaxed max-w-2xl break-words text-sm sm:text-base md:text-lg">
                 {project.overview?.content}
               </p>
             </section>
 
             {project.process && (
               <section id="process" ref={processRef}>
-                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
                   Process
                 </h2>
-                <ul className="text-gray-400 space-y-2 text-sm sm:text-base">
+                <ul className="text-gray-400 space-y-2 text-sm sm:text-base md:text-lg">
                   {project.process.map((step, index) => (
                     <li key={index}>{step.title || step}</li>
                   ))}
@@ -437,7 +374,7 @@ const ProjectDetail = () => {
 
             {project.results?.length > 0 && (
               <section id="results">
-                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-6">
                   Results
                 </h2>
                 <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -450,7 +387,9 @@ const ProjectDetail = () => {
                       <h3 className="text-lg font-semibold text-pink-600 mb-2">
                         {item.title}
                       </h3>
-                      <p className="text-gray-400 text-sm">{item.desc}</p>
+                      <p className="text-gray-400 text-sm sm:text-base md:text-lg">
+                        {item.desc}
+                      </p>
                     </div>
                   ))}
                 </div>

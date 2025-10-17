@@ -10,43 +10,123 @@ gsap.registerPlugin(ScrollTrigger);
 const CommentsSection = () => {
   const [name, setName] = useState("");
   const [comments, setComments] = useState("");
-  const [replayname, setReplayName] = useState("");
+  const [replayName, setReplayName] = useState("");
   const [replay, setReplay] = useState("");
   const [selectedCommentId, setSelectedCommentId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const { commentsData, fetchComments } = useContext(AppContext);
+
+  // Refs for animation
   const sectionRef = useRef(null);
+  const headingRef = useRef(null);
+  const paragraphRef = useRef(null);
+  const commentRefs = useRef([]);
+  // Inside the component
+const commentFormRef = useRef(null);
+const replyFormRefs = useRef([]);
+replyFormRefs.current = [];
 
+  // Clear comment refs before rendering
+  commentRefs.current = [];
+
+  // GSAP animation
   useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
+    if (!commentsData || commentsData.length === 0) return;
+// Animate comment form
+if (commentFormRef.current) {
+  gsap.from(commentFormRef.current, {
+    opacity: 0,
+    y: 50,
+    scale: 0.95,
+    duration: 0.8,
+    ease: "back.out(1.7)",
+    scrollTrigger: {
+      trigger: commentFormRef.current,
+      start: "top 90%",
+      toggleActions: "play none none reverse",
+    },
+  });
+}
 
-    const elements = section.querySelectorAll(
-      ".comment-animate, .reply-animate, .reply-form-animate"
-    );
+// Animate reply forms
+replyFormRefs.current.forEach((form, i) => {
+  gsap.from(form, {
+    opacity: 0,
+    y: 50,
+    scale: 0.95,
+    duration: 0.7,
+    delay: i * 0.1,
+    ease: "back.out(1.7)",
+    scrollTrigger: {
+      trigger: form,
+      start: "top 95%",
+      toggleActions: "play none none reverse",
+    },
+  });
+});
 
-    elements.forEach((el) => {
-      if (el.dataset.animated) return;
-
-      gsap.from(el, {
+    // Animate heading
+    if (headingRef.current) {
+      gsap.from(headingRef.current, {
         opacity: 0,
         y: 50,
-        scale: 0.95,
-        duration: 0.6,
-        ease: "power3.out",
+        scale: 0.8,
+        duration: 1,
+        ease: "back.out(1.7)",
         scrollTrigger: {
-          trigger: el,
-          start: "top 85%",
-          toggleActions: "play none none none",
+          trigger: headingRef.current,
+          start: "top 90%",
+          toggleActions: "play none none reverse",
         },
       });
+    }
 
-      el.dataset.animated = "true";
+    // Animate paragraph
+    if (paragraphRef.current) {
+      gsap.from(paragraphRef.current, {
+        opacity: 0,
+        y: 50,
+        scale: 0.85,
+        duration: 1,
+        delay: 0.2,
+        ease: "back.out(1.7)",
+        scrollTrigger: {
+          trigger: paragraphRef.current,
+          start: "top 90%",
+          toggleActions: "play none none reverse",
+        },
+      });
+    }
+
+    // Animate comment cards
+    commentRefs.current.forEach((el, i) => {
+      gsap.fromTo(
+        el,
+        { opacity: 0, y: 60, scale: 0.85 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.8,
+          delay: i * 0.1,
+          ease: "back.out(1.7)",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 90%",
+            toggleActions: "play none none reverse",
+          },
+        }
+      );
     });
-  }, [commentsData, selectedCommentId]);
 
+
+
+    ScrollTrigger.refresh();
+  }, [commentsData]);
+
+  // Handle comment submission
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -69,6 +149,7 @@ const CommentsSection = () => {
     }
   };
 
+  // Handle reply submission
   const handleReplaySubmit = async (e, commentId) => {
     e.preventDefault();
     setError("");
@@ -76,7 +157,7 @@ const CommentsSection = () => {
       setLoading(true);
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/comments/create-replay`,
-        { replayname, replay, commentId }
+        { replayname: replayName, replay, commentId }
       );
       if (!res.data.success) setError(res.data.message);
       else {
@@ -99,28 +180,33 @@ const CommentsSection = () => {
       className="w-full px-4 sm:px-6 py-8 flex flex-col items-center gap-y-12 text-white"
     >
       {/* Heading */}
-      <div className="flex flex-col items-center text-center space-y-4 max-w-3xl comment-animate">
-        <h2 className="text-2xl sm:text-3xl uppercase font-bold">Comments</h2>
-        <p className="text-gray-300 leading-relaxed max-w-xl">
+      <div className="flex flex-col items-center text-center space-y-4 max-w-3xl">
+        <h2
+          ref={headingRef}
+          className="text-2xl sm:text-3xl uppercase font-bold"
+        >
+          Comments
+        </h2>
+        <p
+          ref={paragraphRef}
+          className="text-gray-300 leading-relaxed max-w-xl"
+        >
           Share your thoughts, feedback, or start a{" "}
           <span className="text-pink-800 font-semibold">conversation</span>.
         </p>
       </div>
 
-      {/* Error Message */}
+      {/* Error */}
       {error && (
-        <div className="w-full max-w-3xl bg-red-600/20 border border-red-600 text-red-400 px-4 py-2 rounded-lg text-sm comment-animate">
+        <div className="w-full max-w-3xl bg-red-600/20 border border-red-600 text-red-400 px-4 py-2 rounded-lg text-sm">
           {error}
         </div>
       )}
 
       {/* Comment Form */}
-      <div className="w-full max-w-3xl rounded-2xl bg-[rgb(40,40,45)] shadow-lg p-4 sm:p-6 comment-animate">
+      <div ref={commentFormRef} className="w-full max-w-3xl rounded-2xl bg-[rgb(40,40,45)] shadow-lg p-4 sm:p-6">
         <h3 className="text-xl font-semibold mb-4">Leave a Comment</h3>
-        <form
-          onSubmit={handleCommentSubmit}
-          className="space-y-4 min-h-[150px] reply-form-animate"
-        >
+        <form onSubmit={handleCommentSubmit} className="space-y-4 min-h-[150px]">
           <input
             type="text"
             placeholder="Your full name"
@@ -145,16 +231,17 @@ const CommentsSection = () => {
         </form>
       </div>
 
-      {/* Comments */}
+      {/* Comment List */}
       <div className="w-full max-w-3xl space-y-6">
-        {commentsData.map((comment) => (
+        {commentsData.map((comment, i) => (
           <div
             key={comment._id}
-            className="rounded-2xl bg-[rgb(40,40,45)] shadow-lg p-4 sm:p-5 comment-animate"
+            ref={(el) => el && commentRefs.current.push(el)}
+            className="rounded-2xl bg-[rgb(40,40,45)] shadow-lg p-4 sm:p-5"
           >
             <div className="flex flex-wrap sm:flex-nowrap items-start gap-4">
-              {/* Avatar */}
-              <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-full bg-pink-800 text-white font-bold text-lg">
+              <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center 
+              rounded-full bg-pink-800 text-white font-bold text-lg">
                 {comment.name?.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
@@ -178,13 +265,14 @@ const CommentsSection = () => {
             {/* Reply Form */}
             {selectedCommentId === comment._id && (
               <form
+              ref={(el) => el && replyFormRefs.current.push(el)}
                 onSubmit={(e) => handleReplaySubmit(e, comment._id)}
-                className="mt-4 space-y-3 p-4 sm:p-5 rounded-2xl bg-black/20 reply-form-animate"
+                className="mt-4 space-y-3 p-4 sm:p-5 rounded-2xl bg-black/20"
               >
                 <input
                   type="text"
                   placeholder="Your name"
-                  value={replayname}
+                  value={replayName}
                   onChange={(e) => setReplayName(e.target.value)}
                   className="w-full px-4 py-2 rounded-xl bg-white/5 text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-pink-800"
                 />
@@ -210,15 +298,13 @@ const CommentsSection = () => {
               {comment.replays?.map((replyItem) => (
                 <div
                   key={replyItem.id}
-                  className="flex flex-wrap sm:flex-nowrap items-start gap-3 bg-white/5 rounded-xl p-3 reply-animate"
+                  className="flex flex-wrap sm:flex-nowrap items-start gap-3 bg-white/5 rounded-xl p-3"
                 >
                   <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-full bg-pink-800 text-white font-bold text-lg">
                     {replyItem.replayname?.charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold break-words">
-                      {replyItem.replayname}
-                    </p>
+                    <p className="font-semibold break-words">{replyItem.replayname}</p>
                     <p className="text-gray-300 whitespace-pre-wrap break-words">
                       {replyItem.replay}
                     </p>
