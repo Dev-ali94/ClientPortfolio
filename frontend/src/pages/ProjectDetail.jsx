@@ -151,7 +151,9 @@ const ProjectDetail = () => {
       {/* Mobile Sidebar */}
       <div
         ref={mobileSidebarRef}
-        className="fixed top-0 left-0 h-full w-72 bg-[rgba(40,40,45,0.8)] backdrop-blur-xl text-gray-200 z-50 transform -translate-x-full flex flex-col shadow-2xl border-r border-white/10"
+        className="fixed top-0 left-0 min-h-screen w-72 bg-[rgba(40,40,45,0.8)] 
+        backdrop-blur-xl text-gray-200 z-50 transform 
+        -translate-x-full flex flex-col shadow-2xl border-r border-white/10"
       >
         <div className="p-4 flex justify-between items-center border-b border-gray-700">
           <h2 className="text-lg font-bold text-white">Menu</h2>
