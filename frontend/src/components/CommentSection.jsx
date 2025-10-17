@@ -19,7 +19,6 @@ const CommentsSection = () => {
   const { commentsData, fetchComments } = useContext(AppContext);
   const sectionRef = useRef(null);
 
-  // Animate heading, form, comments, replies, and reply forms on scroll
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
@@ -29,7 +28,6 @@ const CommentsSection = () => {
     );
 
     elements.forEach((el) => {
-      // Only animate if not already animated
       if (el.dataset.animated) return;
 
       gsap.from(el, {
@@ -40,16 +38,15 @@ const CommentsSection = () => {
         ease: "power3.out",
         scrollTrigger: {
           trigger: el,
-          start: "top 85%", // trigger when element is 85% from top of viewport
+          start: "top 85%",
           toggleActions: "play none none none",
         },
       });
 
-      el.dataset.animated = "true"; // mark as animated
+      el.dataset.animated = "true";
     });
   }, [commentsData, selectedCommentId]);
 
-  // Submit comment
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -72,7 +69,6 @@ const CommentsSection = () => {
     }
   };
 
-  // Submit reply
   const handleReplaySubmit = async (e, commentId) => {
     e.preventDefault();
     setError("");
@@ -100,12 +96,12 @@ const CommentsSection = () => {
     <section
       id="comments"
       ref={sectionRef}
-      className="w-full p-6 flex flex-col items-center gap-y-12 text-white"
+      className="w-full px-4 sm:px-6 py-8 flex flex-col items-center gap-y-12 text-white"
     >
       {/* Heading */}
       <div className="flex flex-col items-center text-center space-y-4 max-w-3xl comment-animate">
-        <h2 className="text-3xl uppercase font-bold">Comments</h2>
-        <p className="text-gray-300 leading-relaxed">
+        <h2 className="text-2xl sm:text-3xl uppercase font-bold">Comments</h2>
+        <p className="text-gray-300 leading-relaxed max-w-xl">
           Share your thoughts, feedback, or start a{" "}
           <span className="text-pink-800 font-semibold">conversation</span>.
         </p>
@@ -119,7 +115,7 @@ const CommentsSection = () => {
       )}
 
       {/* Comment Form */}
-      <div className="w-full max-w-3xl rounded-2xl bg-[rgb(40,40,45)] shadow-lg p-6 comment-animate">
+      <div className="w-full max-w-3xl rounded-2xl bg-[rgb(40,40,45)] shadow-lg p-4 sm:p-6 comment-animate">
         <h3 className="text-xl font-semibold mb-4">Leave a Comment</h3>
         <form
           onSubmit={handleCommentSubmit}
@@ -154,15 +150,18 @@ const CommentsSection = () => {
         {commentsData.map((comment) => (
           <div
             key={comment._id}
-            className="rounded-2xl bg-[rgb(40,40,45)] shadow-lg p-5 comment-animate min-h-[60px]"
+            className="rounded-2xl bg-[rgb(40,40,45)] shadow-lg p-4 sm:p-5 comment-animate"
           >
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 flex items-center justify-center rounded-full bg-pink-800 text-white font-bold text-lg">
+            <div className="flex flex-wrap sm:flex-nowrap items-start gap-4">
+              {/* Avatar */}
+              <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-full bg-pink-800 text-white font-bold text-lg">
                 {comment.name?.charAt(0).toUpperCase()}
               </div>
-              <div>
-                <p className="font-bold text-lg">{comment.name}</p>
-                <p className="text-gray-300">{comment.comments}</p>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-lg break-words">{comment.name}</p>
+                <p className="text-gray-300 whitespace-pre-wrap break-words">
+                  {comment.comments}
+                </p>
                 <button
                   onClick={() =>
                     setSelectedCommentId(
@@ -180,7 +179,7 @@ const CommentsSection = () => {
             {selectedCommentId === comment._id && (
               <form
                 onSubmit={(e) => handleReplaySubmit(e, comment._id)}
-                className="mt-4 space-y-3 p-5 rounded-2xl bg-black/20 items-center reply-form-animate"
+                className="mt-4 space-y-3 p-4 sm:p-5 rounded-2xl bg-black/20 reply-form-animate"
               >
                 <input
                   type="text"
@@ -207,18 +206,22 @@ const CommentsSection = () => {
             )}
 
             {/* Replies */}
-            <div className="mt-4 space-y-3 pl-14 border-l-2 border-pink-800">
+            <div className="mt-4 space-y-3 sm:pl-14 pl-6 border-l-2 border-pink-800">
               {comment.replays?.map((replyItem) => (
                 <div
                   key={replyItem.id}
-                  className="flex items-start gap-3 bg-white/5 rounded-xl p-3 reply-animate min-h-[50px]"
+                  className="flex flex-wrap sm:flex-nowrap items-start gap-3 bg-white/5 rounded-xl p-3 reply-animate"
                 >
-                  <div className="w-10 h-10 flex items-center justify-center rounded-full bg-pink-800 text-white font-bold text-lg">
+                  <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-full bg-pink-800 text-white font-bold text-lg">
                     {replyItem.replayname?.charAt(0).toUpperCase()}
                   </div>
-                  <div>
-                    <p className="font-semibold">{replyItem.replayname}</p>
-                    <p className="text-gray-300">{replyItem.replay}</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold break-words">
+                      {replyItem.replayname}
+                    </p>
+                    <p className="text-gray-300 whitespace-pre-wrap break-words">
+                      {replyItem.replay}
+                    </p>
                   </div>
                 </div>
               ))}

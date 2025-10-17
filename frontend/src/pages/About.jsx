@@ -166,7 +166,7 @@ const About = () => {
         </div>
 
         {/* Right Image */}
-        <div className="w-full lg:w-1/2 flex justify-center lg:mt-10 will-change-transform">
+        <div className="w-full lg:w-1/2 flex justify-center lg:mt-50 will-change-transform">
           <div
             ref={imageRef}
             className="relative w-3/4 sm:w-2/3 md:w-1/2 lg:w-3/4 xl:w-2/3 shadow-lg shadow-black/60 rounded-2xl overflow-hidden"
