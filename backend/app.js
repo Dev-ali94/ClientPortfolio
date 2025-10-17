@@ -12,28 +12,21 @@ dotenv.config();
 connectDB()
 
 const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  process.env.ADMIN_URL,
-  "http://localhost:5173"
+  process.env.ADMIN_URL,   // your admin frontend URL
+  "http://localhost:5173"  // local dev URL
 ];
+
 
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true
+  origin: allowedOrigins,  // allow only these origins
+  credentials: true        // allow cookies
 }));
+
+
 
 app.use("/api/project", projectRoutes);
 app.use("/api/comments", commentsRoutes);
