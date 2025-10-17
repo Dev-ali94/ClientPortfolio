@@ -1,11 +1,11 @@
 import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
-import commentsRoutes from './routes/commentsRoutes.js'
-import contactRoutes from './routes/ContactRoutes.js'
-import AdminLogin from './routes/adminRoutes.js'
-import projectRoutes from './routes/projectRoutes.js'
-import cors from 'cors'
+import commentsRoutes from './routes/commentsRoutes.js';
+import contactRoutes from './routes/ContactRoutes.js';
+import AdminLogin from './routes/adminRoutes.js';
+import projectRoutes from './routes/projectRoutes.js';
+import cors from 'cors';
 import cookieParser from "cookie-parser";
 
 dotenv.config();
@@ -19,24 +19,23 @@ const allowedOrigins = [
   "http://localhost:5173"  // local dev URL
 ];
 
-// Middleware
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    // Admin requests (cookies) should have credentials
-    const isAdmin = origin === process.env.ADMIN_URL;
-    cors({
-      origin,
-      credentials: isAdmin
-    })(req, res, next);
-  } else {
-    next();
-  }
-});
+// Dynamic CORS
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like curl, mobile, server-to-server)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true); // allow this origin
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true, // allow cookies for admin
+}));
 
 // Routes
 app.use("/api/project", projectRoutes);
