@@ -1,68 +1,61 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { FaPaperPlane } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { AppContext } from "../context/AppContext";
 
 const Login = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
 
-  // Check if admin is already logged in
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const { data } = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/admin/auth`,
-          { withCredentials: true }
-        );
-        setIsLoggedIn(data.success); // backend success determines login
-      } catch (err) {
-        setIsLoggedIn(false); // not logged in
-      } finally {
-        setLoading(false);
-      }
-    };
-    checkAuth();
-  }, []);
-
-  // Redirect immediately if logged in
-  useEffect(() => {
-    if (!loading && isLoggedIn) {
-      navigate("/"); // redirect to main page
-    }
-  }, [loading, isLoggedIn, navigate]);
+  const {
+    setIsLoggedIn,
+    isLoggedIn,
+    userData,
+    getAuthState,
+    fetchComments,
+    fetchProjects,
+    fetchContacts,
+  } = useContext(AppContext);
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
+    axios.defaults.withCredentials = true;
+
     try {
       const { data } = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/admin/login`,
-        { name, email, password },
-        { withCredentials: true }
+        { name, email, password }
       );
-
       if (data.success) {
-        navigate("/"); // redirect on success
+        toast.success(data.message)
+        await getAuthState();
+        if (!userData?.verified) {
+          toast.error("Your account is not verified!");
+          setIsLoggedIn(false);
+          return navigate("/login");
+        }
+        await fetchComments();
+        await fetchProjects();
+        await fetchContacts();
+
+        navigate("/"); 
       } else {
-        alert(data.message); // show backend message
+        toast.error(data.message);
       }
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message || "Login failed");
+      toast.error(err.response?.data?.message || "Login failed");
     }
   };
-
-  // Show loading text while checking auth
-  if (loading) {
-    return <p className="text-white text-center mt-10">Checking login...</p>;
-  }
-
-  // Prevent rendering login page if already logged in
-  if (isLoggedIn) return null;
+  useEffect(() => {
+    if (isLoggedIn && userData?.verified) {
+      navigate("/");
+    }
+  }, [isLoggedIn, userData, navigate]);
 
   return (
     <section className="w-full min-h-screen bg-[#1a1a1d] flex flex-col items-center justify-center text-white px-6 py-12">

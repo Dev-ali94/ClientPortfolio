@@ -11,7 +11,6 @@ export const adminLogin = async (req, res) => {
         message: "Name, email, and password are required",
       });
     }
-
     const adminName = process.env.ADMIN_NAME;
     const adminEmail = process.env.ADMIN_EMAIL;
     const adminPassword = process.env.ADMIN_PASSWORD;
@@ -23,7 +22,6 @@ export const adminLogin = async (req, res) => {
       });
     }
 
-    // Check credentials
     if (name !== adminName) {
       return res.status(401).json({
         success: false,
@@ -46,13 +44,13 @@ export const adminLogin = async (req, res) => {
     }
 
     // Generate JWT
-    const token = jwt.sign({ name, email }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign({ name, email,verified: true }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
     // Set cookie
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", 
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -68,14 +66,18 @@ export const adminLogin = async (req, res) => {
     });
   }
 };
-export const isAuthenticated=async (req,res) => {
+export const isAuthenticated = (req, res) => {
   try {
-    return res.json({success:true , message:"Autherized user"})
+    const { name, email, verified } = req.admin;
+    return res.json({
+      success: true,
+      message: "Authorized user",
+      user: { verified },
+    });
   } catch (error) {
-    res.json({success:false,message:error.message})
+    return res.status(500).json({ success: false, message: error.message });
   }
-}
-
+};
 export const adminLogout = async (req, res) => {
   try {
     // Clear the token cookie

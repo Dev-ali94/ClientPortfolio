@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-toastify";
 import {
   FaComments,
   FaEnvelope,
@@ -11,8 +12,10 @@ import {
   FaProjectDiagram,
 } from "react-icons/fa";
 import { FiChevronRight } from "react-icons/fi";
+import { AppContext } from "../context/AppContext";
 
 const Sidebar = ({ onSelect }) => {
+  const { setIsLoggedIn, setCommentsData, setProjectsData, setContactsData } = useContext(AppContext);
   const [openBlog, setOpenBlog] = useState(false);
   const [active, setActive] = useState("home");
   const navigate = useNavigate();
@@ -20,25 +23,31 @@ const Sidebar = ({ onSelect }) => {
     setActive(page);
     onSelect(page);
   };
-// logout function
-  const handleLogout = async () => {
+  // logout function
+ const handleLogout = async () => {
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/admin/logout`,
         {},
         { withCredentials: true }
       );
+
       if (res.data.success) {
-        alert("Logout successful");
+        setIsLoggedIn(false);
+        setCommentsData([]);
+        setProjectsData([]);
+        setContactsData([]);
+        toast.success("Logout successful!");
         navigate("/login");
       } else {
-        alert(res.data.message || "Logout failed ");
+        toast.error(res.data.message || "Logout failed");
       }
     } catch (error) {
-      console.error("Logout error:", error.message);
-      alert("Something went wrong during logout");
+      console.error("Logout error:", error.response?.data?.message || error.message);
+      toast.error(error.response?.data?.message || "Something went wrong during logout");
     }
   };
+
 
   return (
     <div className="w-72 h-screen bg-[#1a1a1d] text-white flex flex-col
@@ -57,10 +66,9 @@ const Sidebar = ({ onSelect }) => {
           <button
             onClick={() => handleSelect("home")}
             className={`flex items-center space-x-3 px-3 py-2 rounded-xl transition-all
-              ${
-                active === "home"
-                  ? "bg-[#232326] text-pink-500"
-                  : "hover:bg-[#232326] hover:text-pink-500"
+              ${active === "home"
+                ? "bg-[#232326] text-pink-500"
+                : "hover:bg-[#232326] hover:text-pink-500"
               }`}
           >
             <FaHome />
@@ -71,10 +79,9 @@ const Sidebar = ({ onSelect }) => {
             <button
               onClick={() => setOpenBlog(!openBlog)}
               className={`flex items-center justify-between w-full px-3 py-2 rounded-xl transition-all
-                ${
-                  openBlog
-                    ? "bg-[#232326] text-pink-500"
-                    : "hover:bg-[#232326] hover:text-pink-500"
+                ${openBlog
+                  ? "bg-[#232326] text-pink-500"
+                  : "hover:bg-[#232326] hover:text-pink-500"
                 }`}
             >
               <span className="flex items-center space-x-3">
@@ -82,9 +89,8 @@ const Sidebar = ({ onSelect }) => {
                 <span className="font-medium">Project</span>
               </span>
               <FiChevronRight
-                className={`transition-transform ${
-                  openBlog ? "rotate-90 text-pink-500" : "text-gray-400"
-                }`}
+                className={`transition-transform ${openBlog ? "rotate-90 text-pink-500" : "text-gray-400"
+                  }`}
               />
             </button>
 
@@ -94,10 +100,9 @@ const Sidebar = ({ onSelect }) => {
                 <button
                   onClick={() => handleSelect("all-project")}
                   className={`flex items-center space-x-2 px-3 py-2 text-sm rounded-lg transition-all
-                    ${
-                      active === "all-project"
-                        ? "bg-[#232326] text-pink-500"
-                        : "hover:bg-[#232326] hover:text-pink-500"
+                    ${active === "all-project"
+                      ? "bg-[#232326] text-pink-500"
+                      : "hover:bg-[#232326] hover:text-pink-500"
                     }`}
                 >
                   <FaList />
@@ -106,10 +111,9 @@ const Sidebar = ({ onSelect }) => {
                 <button
                   onClick={() => handleSelect("create-project")}
                   className={`flex items-center space-x-2 px-3 py-2 text-sm rounded-lg transition-all
-                    ${
-                      active === "create-project"
-                        ? "bg-[#232326] text-pink-500"
-                        : "hover:bg-[#232326] hover:text-pink-500"
+                    ${active === "create-project"
+                      ? "bg-[#232326] text-pink-500"
+                      : "hover:bg-[#232326] hover:text-pink-500"
                     }`}
                 >
                   <FaPlus />
@@ -122,10 +126,9 @@ const Sidebar = ({ onSelect }) => {
           <button
             onClick={() => handleSelect("comments")}
             className={`flex items-center space-x-3 px-3 py-2 rounded-xl transition-all
-              ${
-                active === "comments"
-                  ? "bg-[#232326] text-pink-500"
-                  : "hover:bg-[#232326] hover:text-pink-500"
+              ${active === "comments"
+                ? "bg-[#232326] text-pink-500"
+                : "hover:bg-[#232326] hover:text-pink-500"
               }`}
           >
             <FaComments />
@@ -135,10 +138,9 @@ const Sidebar = ({ onSelect }) => {
           <button
             onClick={() => handleSelect("contact")}
             className={`flex items-center space-x-3 px-3 py-2 rounded-xl transition-all
-              ${
-                active === "contact"
-                  ? "bg-[#232326] text-pink-500"
-                  : "hover:bg-[#232326] hover:text-pink-500"
+              ${active === "contact"
+                ? "bg-[#232326] text-pink-500"
+                : "hover:bg-[#232326] hover:text-pink-500"
               }`}
           >
             <FaEnvelope />
