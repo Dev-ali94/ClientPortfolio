@@ -18,24 +18,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-const allowedOrigins = [
-  process.env.ADMIN_URL,   // admin frontend
-  process.env.PUBLIC_URL,  // public frontend
-  "http://localhost:5173"  // local dev URL
-];
 app.use(cors({
-  origin: function (origin, callback) {
-    // allow requests with no origin (like Postman)
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true, // <--- This is mandatory for cookies
+  origin: process.env.ADMIN_URL,  
+  credentials: true               
 }));
+
 // Routes
 app.use("/api/project", projectRoutes);
 app.use("/api/comments", commentsRoutes);
