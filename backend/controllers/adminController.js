@@ -51,9 +51,9 @@ export const adminLogin = async (req, res) => {
     // Set cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // true in production (HTTPS)
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // cross-origin
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      secure: process.env.NODE_ENV === "production", 
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     return res.json({
@@ -68,20 +68,13 @@ export const adminLogin = async (req, res) => {
     });
   }
 };
-
-
-export const isAuthenticated = async (req, res) => {
+export const isAuthenticated=async (req,res) => {
   try {
-    const token = req.cookies.token;
-    if (!token) {
-      return res.json({ success: false, message: "No token, not authenticated" });
-    }
-    jwt.verify(token, process.env.JWT_SECRET);
-    return res.json({ success: true });
+    return res.json({success:true , message:"Autherized user"})
   } catch (error) {
-    return res.json({ success: false, message: error.message });
+    res.json({success:false,message:error.message})
   }
-};
+}
 
 export const adminLogout = async (req, res) => {
   try {
@@ -89,7 +82,7 @@ export const adminLogout = async (req, res) => {
     res.clearCookie("token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     });
     // Send response
     return res.json({

@@ -19,9 +19,9 @@ const Login = () => {
           `${import.meta.env.VITE_BACKEND_URL}/api/admin/auth`,
           { withCredentials: true }
         );
-        setIsLoggedIn(data.success); // use backend success
+        setIsLoggedIn(data.success); // backend success determines login
       } catch (err) {
-        setIsLoggedIn(false);
+        setIsLoggedIn(false); // not logged in
       } finally {
         setLoading(false);
       }
@@ -48,13 +48,15 @@ const Login = () => {
       if (data.success) {
         navigate("/"); // redirect on success
       } else {
-        alert(data.message); // show backend error message
+        alert(data.message); // show backend message
       }
     } catch (err) {
+      console.error(err);
       alert(err.response?.data?.message || "Login failed");
     }
   };
 
+  // Show loading text while checking auth
   if (loading) {
     return <p className="text-white text-center mt-10">Checking login...</p>;
   }
@@ -82,6 +84,7 @@ const Login = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-[#18181b] text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-pink-600 transition"
+              required
             />
           </div>
 
@@ -93,6 +96,7 @@ const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-[#18181b] text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-pink-600 transition"
+              required
             />
           </div>
 
@@ -104,6 +108,7 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-[#18181b] text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-pink-600 transition"
+              required
             />
           </div>
 
