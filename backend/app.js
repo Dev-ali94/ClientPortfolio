@@ -12,14 +12,31 @@ const app = express();
 dotenv.config();
 connectDB();
 
+const allowedOrigins = [
+  process.env.ADMIN_URL,
+  process.env.FRONTEND_URL,
+];
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cors({
-  origin: process.env.ADMIN_URL,
-  credentials: true 
-}));
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
 // Routes
 app.use("/api/project", projectRoutes);
